@@ -8,7 +8,7 @@ from enum import Enum
 
 from mcp_client.client import create_mcp_client
 from util.logger import get_logger
-from config import OPENAI_CONFIG
+from config import GROQ_CONFIG
 
 logger = get_logger(__name__)
     
@@ -56,7 +56,10 @@ class WebResearchAgent:
         Web Research Agent that performs ReAct (Reasoning + Acting) loops to search, analyze, and synthesize web content for research queries.
     """
     def __init__(self):
-        self.client = OpenAI(api_key=OPENAI_CONFIG["api_key"])
+        self.client = OpenAI(
+            api_key=GROQ_CONFIG["api_key"],
+            base_url=GROQ_CONFIG["base_url"]
+        )
         
         self.max_iterations = 3                 # Maximum ReAct loop iterations
         self.is_initialized = False
@@ -215,7 +218,7 @@ class WebResearchAgent:
         try:
             
             response = self.client.chat.completions.create(
-                model = OPENAI_CONFIG["default_model"],
+                model = GROQ_CONFIG["default_model"],
                 messages=[
                     {"role": "system", "content": "You are an expert researcher in the THOUGHT phase of ReAct. Provide clear, logical reasoning about what to do next."},
                     {"role": "user", "content": thought_prompt}
@@ -252,7 +255,7 @@ class WebResearchAgent:
         """
         try:
             response = self.client.chat.completions.create(
-                model=OPENAI_CONFIG["default_model"],
+                model=GROQ_CONFIG["default_model"],
                 messages=[
                     {"role": "system", "content": "You are in the ACTION phase. Choose and execute one tool based on your thought."},
                     {"role": "user", "content": action_prompt}
@@ -312,7 +315,7 @@ class WebResearchAgent:
         """
         try:
             response = self.client.chat.completions.create(
-                model=OPENAI_CONFIG["default_model"],
+                model=GROQ_CONFIG["default_model"],
                 messages=[
                     {"role": "system", "content": "You are in the OBSERVATION phase. Interpret the action results and explain what you learned."},
                     {"role": "user", "content": observation_prompt}
@@ -377,7 +380,7 @@ class WebResearchAgent:
         """
         try:
             response = self.client.responses.parse(
-                model=OPENAI_CONFIG["default_model"],
+                model=GROQ_CONFIG["default_model"],
                 input=[
                     {"role": "system", "content": "You are in the REFLECTION phase. Evaluate progress and decide whether to continue or conclude."},
                     {"role": "user", "content": reflection_prompt}
@@ -483,7 +486,7 @@ class WebResearchAgent:
             """
             
             response = self.client.chat.completions.create(
-                model=OPENAI_CONFIG["default_model"],
+                model=GROQ_CONFIG["default_model"],
                 messages=[
                     {"role": "system", "content": "You are an expert at extracting key research findings."},
                     {"role": "user", "content": extraction_prompt}
@@ -531,7 +534,7 @@ class WebResearchAgent:
             """
             
             response = self.client.chat.completions.create(
-                model=OPENAI_CONFIG["default_model"],
+                model=GROQ_CONFIG["default_model"],
                 messages=[
                     {"role": "system", "content": "Create a comprehensive research summary showing how ReAct methodology produced thorough results."},
                     {"role": "user", "content": synthesis_prompt}
